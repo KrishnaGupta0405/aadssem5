@@ -13,7 +13,7 @@ function App() {
 
 
 //========================================================================
-//1. Randomized Quicksort and find no. of comparisons
+// 1. Randomized Quicksort and find no. of comparisons
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -21,51 +21,56 @@ using namespace std;
 int comparisons = 0;
 
 int partition(vector<int>& arr, int low, int high) {
-  int pivot = arr[high];
-  int i = low - 1;
-  for(int j = low; j <= high - 1; j++) {
-    comparisons++;
-    if(arr[j] <= pivot) {
-      i++;
-      swap(arr[i], arr[j]);
+    int pivot = arr[high];
+    int i = low - 1;
+    for(int j = low; j <= high - 1; j++) {
+        comparisons++;
+        if(arr[j] <= pivot) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
     }
-  }
-  swap(arr[i + 1], arr[high]);
-  return i + 1;
+    swap(arr[i + 1], arr[high]);
+    return i + 1;
 }
 
 int randomPartition(vector<int>& arr, int low, int high) {
-  int pivot = low + rand() % (high - low + 1);
-  swap(arr[pivot], arr[high]);
-  return partition(arr, low, high);
+    int pivot = low + rand() % (high - low + 1);
+    swap(arr[pivot], arr[high]);
+    return partition(arr, low, high);
 }
 
 void randomizedQuickSort(vector<int>& arr, int low, int high) {
-  if(low < high) {
-    int pi = randomPartition(arr, low, high);
-    randomizedQuickSort(arr, low, pi - 1);
-    randomizedQuickSort(arr, pi + 1, high);
-  }
+    if(low < high) {
+        int pi = randomPartition(arr, low, high);
+        randomizedQuickSort(arr, low, pi - 1);
+        randomizedQuickSort(arr, pi + 1, high);
+    }
 }
 
 int main() {
-  int n;
-  cout << "Enter the number of elements: ";
-  cin >> n;
-  vector<int> arr(n);
-  cout << "Enter the elements: ";
-  for(int i = 0; i < n; i++) {
-    cin >> arr[i];
-  }
-  randomizedQuickSort(arr, 0, n - 1);
-  cout << "Sorted array: ";
-  for(int i = 0; i < n; i++) {
-    cout << arr[i] << " ";
-  }
-  cout << endl;
-  cout << "Number of comparisons: " << comparisons << endl;
-  return 0;
+    // ------------ Test case 1 ------------
+    vector<int> arr1 = {9, 4, 1, 7, 3};
+    comparisons = 0; // reset
+    randomizedQuickSort(arr1, 0, arr1.size() - 1);
+
+    cout << "Test Case 1 - Sorted array: ";
+    for(int x : arr1) cout << x << " ";
+    cout << "\nComparisons: " << comparisons << "\n\n";
+
+    // ------------ Test case 2 ------------
+    vector<int> arr2 = {10, 2, 8, 6, 5, 1};
+    comparisons = 0; // reset
+    randomizedQuickSort(arr2, 0, arr2.size() - 1);
+
+    cout << "Test Case 2 - Sorted array: ";
+    for(int x : arr2) cout << x << " ";
+    cout << "\nComparisons: " << comparisons << "\n";
+
+    return 0;
 }
+
+
 //=================================================================
 //2. Minimum spanning tree using kruskal's algorithm | Also showing the edges of the MST
 #include <iostream>
@@ -128,57 +133,92 @@ int main() {
 using namespace std;
 
 struct Edge{
-  int u, v, w;
+    int u, v, w;
 };
 
 void BellmanFord(int V, vector<Edge> &edges, int source){
-  int INF = 1000000000; 
-  vector<int> dist(V, INF);
-  dist[source] = 0;
+    int INF = 1000000000; 
+    vector<int> dist(V, INF);
+    dist[source] = 0;
 
-  for (int i = 0; i < V - 1; i++) {
-    for (int j = 0; j < edges.size(); j++) {
-      int u = edges[j].u;
-      int v = edges[j].v;
-      int w = edges[j].w;
-      if (dist[u] != INF && dist[u] + w < dist[v]) {
-        dist[v] = dist[u] + w;
-      }
+    // Relax edges V-1 times
+    for(int i = 0; i < V - 1; i++){
+        for(int j = 0; j < edges.size(); j++){
+            int u = edges[j].u;
+            int v = edges[j].v;
+            int w = edges[j].w;
+            if(dist[u] != INF && dist[u] + w < dist[v]){
+                dist[v] = dist[u] + w;
+            }
+        }
     }
-  }
 
-  // Negative weight cycle check
-  for (int j = 0; j < edges.size(); j++){
-    int u = edges[j].u;
-    int v = edges[j].v;
-    int w = edges[j].w;
-    if (dist[u] != INF && dist[u] + w < dist[v]) {
-      cout << "Graph contains a negative weight cycle!" << endl;
-      return;
+    // Check negative cycle
+    for(int j = 0; j < edges.size(); j++){
+        int u = edges[j].u;
+        int v = edges[j].v;
+        int w = edges[j].w;
+        if(dist[u] != INF && dist[u] + w < dist[v]){
+            cout << "Graph contains a negative weight cycle!" << endl;
+            return;
+        }
     }
-  }
 
-  // Print shortest distances
-  for (int i = 0; i < V; i++) {
-    cout << "Distance of node " << i << " from source: ";
-    if (dist[i] == INF) cout << "Unreachable";
-    else cout << dist[i];
+    // Print shortest distances
+    for(int i = 0; i < V; i++){
+        cout << "Distance of node " << i << " from source: ";
+        if(dist[i] == INF) cout << "Unreachable";
+        else cout << dist[i];
+        cout << endl;
+    }
     cout << endl;
-  }
 }
 
-int main() {
-  int V, E, source;
-  cout << "Enter the number of vertices, edges, and source: ";
-  cin >> V >> E >> source;
-  vector<Edge> edges(E);
-  for (int i = 0; i < E; i++) {
-    cout << "Enter the edges (u v w): ";
-    cin >> edges[i].u >> edges[i].v >> edges[i].w;
-  }
-  BellmanFord(V, edges, source);
-  return 0;
+int main(){
+
+    // =======================
+    // Test Case 1 (No cycle)
+    // =======================
+    cout << "===== Test Case 1 =====" << endl;
+    
+    int V1 = 5;
+    vector<Edge> edges1 = {
+        {0, 1, 6},
+        {0, 2, 7},
+        {1, 2, 8},
+        {1, 3, -4},
+        {1, 4, 5},
+        {2, 3, 9},
+        {2, 4, -3},
+        {3, 1, -2},
+        {4, 3, 7}
+    };
+    int source1 = 0;
+    
+    BellmanFord(V1, edges1, source1);
+
+
+    // =======================
+    // Test Case 2 (Negative cycle)
+    // =======================
+    cout << "===== Test Case 2 =====" << endl;
+
+    int V2 = 4;
+    vector<Edge> edges2 = {
+        {0, 1, 1},
+        {1, 2, -1},
+        {2, 3, -1},
+        {3, 1, -1}   // creates negative cycle
+    };
+    int source2 = 0;
+    
+    BellmanFord(V2, edges2, source2);
+
+    return 0;
 }
+
+
+
 //===============================================================================
 //4. Randomized Select
 #include <iostream>
@@ -188,56 +228,68 @@ using namespace std;
 int comparisons = 0;
 
 int partition(vector<int>& arr, int low, int high) {
-  int pivot = arr[high];
-  int i = low - 1;
-  for(int j = low; j <= high - 1; j++) {
-    comparisons++;
-    if(arr[j] <= pivot) {
-      i++;
-      swap(arr[i], arr[j]);
+    int pivot = arr[high];
+    int i = low - 1;
+    for(int j = low; j <= high - 1; ++j) {
+        comparisons++;
+        if(arr[j] <= pivot) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
     }
-  }
-  swap(arr[i + 1], arr[high]);
-  return i + 1;
+    swap(arr[i + 1], arr[high]);
+    return i + 1;
 }
 
 int randomPartition(vector<int>& arr, int low, int high) {
-  int pivot = low + rand() % (high - low + 1);
-  swap(arr[pivot], arr[high]);
-  return partition(arr, low, high);
+    int pivot = low + rand() % (high - low + 1);
+    swap(arr[pivot], arr[high]);
+    return partition(arr, low, high);
 }
 
 int randomizedSelect(vector<int>& arr, int low, int high, int k) {
-  if(low == high) {
-    return arr[low];
-  }
-  int pi = randomPartition(arr, low, high);
-  if(pi < k) {
-    return randomizedSelect(arr, pi + 1, high, k);
-  } else if(pi > k) {
-    return randomizedSelect(arr, low, pi - 1, k);
-  } else {
-    return arr[pi];
-  }
+    if(low == high)
+        return arr[low];
+
+    int pi = randomPartition(arr, low, high);
+
+    if(pi < k)
+        return randomizedSelect(arr, pi + 1, high, k);
+    else if(pi > k)
+        return randomizedSelect(arr, low, pi - 1, k);
+    else
+        return arr[pi];
 }
 
 int main() {
-  int n;
-  cout << "Enter the number of elements: ";
-  cin >> n;
-  vector<int> arr(n);
-  cout << "Enter the elements: ";
-  for(int i = 0; i < n; i++) {
-    cin >> arr[i];
-  }
-  int k;
-  cout << "Enter the value of k: ";
-  cin >> k;
-  int result = randomizedSelect(arr, 0, n - 1, k - 1);
-  cout << "The " << k << "th smallest element is: " << result << endl;
-  cout << "Number of comparisons: " << comparisons << endl;
-  return 0;
+
+    // ---------------------- Test Case 1 ----------------------
+    cout << "===== Test Case 1 =====" << endl;
+    vector<int> arr1 = {10, 4, 5, 8, 6, 11, 26};
+    int k1 = 3;   // 3rd smallest element
+
+    comparisons = 0; // reset
+    int result1 = randomizedSelect(arr1, 0, arr1.size() - 1, k1 - 1);
+
+    cout << k1 << "th smallest element: " << result1 << endl;
+    cout << "Comparisons: " << comparisons << endl << endl;
+
+
+    // ---------------------- Test Case 2 ----------------------
+    cout << "===== Test Case 2 =====" << endl;
+    vector<int> arr2 = {12, 7, 9, 21, 13, 2, 1, 5};
+    int k2 = 5;   // 5th smallest element
+
+    comparisons = 0; // reset
+    int result2 = randomizedSelect(arr2, 0, arr2.size() - 1, k2 - 1);
+
+    cout << k2 << "th smallest element: " << result2 << endl;
+    cout << "Comparisons: " << comparisons << endl;
+
+    return 0;
 }
+
+
 //=======================================================================================
 // 5. BTREE
 #include <iostream>
@@ -261,12 +313,11 @@ struct BNode {
     }
 };
 
-// Function to split a full child
+// Split full child
 void splitChild(BNode* parent, int index, BNode* fullChild) {
     BNode* newChild = new BNode();
     newChild->isLeaf = fullChild->isLeaf;
 
-    // Move one key to new node
     newChild->keys[0] = fullChild->keys[1];
     newChild->keyCount = 1;
 
@@ -277,15 +328,12 @@ void splitChild(BNode* parent, int index, BNode* fullChild) {
 
     fullChild->keyCount = 1;
 
-    // Move parent's children
-    for (int i = parent->keyCount; i >= index + 1; i--) {
+    for(int i = parent->keyCount; i >= index + 1; i--) {
         parent->child[i + 1] = parent->child[i];
     }
-
     parent->child[index + 1] = newChild;
 
-    // Move parent's keys
-    for (int i = parent->keyCount - 1; i >= index; i--) {
+    for(int i = parent->keyCount - 1; i >= index; i--) {
         parent->keys[i + 1] = parent->keys[i];
     }
 
@@ -298,16 +346,14 @@ void insertNonFull(BNode* node, int key) {
     int i = node->keyCount - 1;
 
     if (node->isLeaf) {
-        // Insert key in sorted order
-        while (i >= 0 && key < node->keys[i]) {
+        while(i >= 0 && key < node->keys[i]) {
             node->keys[i + 1] = node->keys[i];
             i--;
         }
         node->keys[i + 1] = key;
         node->keyCount++;
     } else {
-        // Find child to insert
-        while (i >= 0 && key < node->keys[i]) {
+        while(i >= 0 && key < node->keys[i]) {
             i--;
         }
         i++;
@@ -322,7 +368,7 @@ void insertNonFull(BNode* node, int key) {
     }
 }
 
-// Insert a new key
+// Insert key
 void insert(BNode* &root, int key) {
     if (root->keyCount == ORDER - 1) {
         BNode* newRoot = new BNode();
@@ -332,8 +378,7 @@ void insert(BNode* &root, int key) {
         splitChild(newRoot, 0, root);
 
         int i = 0;
-        if (key > newRoot->keys[0])
-            i++;
+        if (key > newRoot->keys[0]) i++;
         insertNonFull(newRoot->child[i], key);
 
         root = newRoot;
@@ -342,34 +387,52 @@ void insert(BNode* &root, int key) {
     }
 }
 
-// Print tree (simple)
+// Print B-tree
 void printTree(BNode* node, int level = 0) {
-    if (node == NULL) return;
+    if (!node) return;
 
     cout << "Level " << level << " : ";
-    for (int i = 0; i < node->keyCount; i++) {
+    for(int i = 0; i < node->keyCount; i++) {
         cout << node->keys[i] << " ";
     }
     cout << endl;
 
-    if (!node->isLeaf) {
-        for (int i = 0; i <= node->keyCount; i++) {
+    if(!node->isLeaf) {
+        for(int i = 0; i <= node->keyCount; i++) {
             printTree(node->child[i], level + 1);
         }
     }
 }
 
 int main() {
-    BNode* root = new BNode();
 
-    int arr[] = {10, 20, 5, 6, 12, 30, 7, 17};
-    int n = sizeof(arr) / sizeof(arr[0]);
+    // ================= Test Case 1 =================
+    cout << "===== Test Case 1 =====" << endl;
 
-    for (int i = 0; i < n; i++) {
-        insert(root, arr[i]);
+    BNode* root1 = new BNode();
+    int arr1[] = {10, 20, 5, 6, 12, 30, 7, 17};
+    int n1 = sizeof(arr1) / sizeof(arr1[0]);
+
+    for(int i = 0; i < n1; i++) {
+        insert(root1, arr1[i]);
     }
 
-    printTree(root);
+    printTree(root1);
+    cout << endl;
+
+
+    // ================= Test Case 2 =================
+    cout << "===== Test Case 2 =====" << endl;
+
+    BNode* root2 = new BNode();
+    int arr2[] = {50, 40, 30, 20, 10, 60, 70, 80};
+    int n2 = sizeof(arr2) / sizeof(arr2[0]);
+
+    for(int i = 0; i < n2; i++) {
+        insert(root2, arr2[i]);
+    }
+
+    printTree(root2);
 
     return 0;
 }
@@ -443,7 +506,7 @@ void KMPsearch(string text, string pat) {
 int main() {
     string text = "ABABDABACDABABCABAB";
     string pat = "ABABCABAB";
-
+    cout<< "Text is -> " << text << "  ,pattern is -> "<< pat <<endl;
     KMPsearch(text, pat);
 
     return 0;
@@ -514,7 +577,7 @@ int main() {
     string text = "banana";
 
     Node* root = buildSuffixTree(text);
-
+    cout << "Text is -> " << text <<endl;
     cout << "All suffixes in the suffix tree:" << endl;
     printTree(root);
 
