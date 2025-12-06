@@ -10,6 +10,7 @@ function App() {
 // 5. BTREE
 // 6. KMP
 //7. SUFFIX TREE USING BURTEFORCE SUFFICE TREE METHOD
+// 8. trie for insert and search
 
 
 //========================================================================
@@ -223,6 +224,8 @@ int main(){
 //4. Randomized Select
 #include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 
 int comparisons = 0;
@@ -230,7 +233,8 @@ int comparisons = 0;
 int partition(vector<int>& arr, int low, int high) {
     int pivot = arr[high];
     int i = low - 1;
-    for(int j = low; j <= high - 1; ++j) {
+
+    for(int j = low; j < high; ++j) {
         comparisons++;
         if(arr[j] <= pivot) {
             i++;
@@ -247,21 +251,54 @@ int randomPartition(vector<int>& arr, int low, int high) {
     return partition(arr, low, high);
 }
 
+// randomized select (k is zero-based)
 int randomizedSelect(vector<int>& arr, int low, int high, int k) {
-    if(low == high)
+    if (low == high)
         return arr[low];
 
     int pi = randomPartition(arr, low, high);
 
-    if(pi < k)
-        return randomizedSelect(arr, pi + 1, high, k);
-    else if(pi > k)
+    if (pi == k)
+        return arr[pi];
+    else if (pi > k)
         return randomizedSelect(arr, low, pi - 1, k);
     else
-        return arr[pi];
+        return randomizedSelect(arr, pi + 1, high, k);
 }
 
 int main() {
+    srand(time(0));
+
+    // -------------------------------
+    // Example test cases
+    // -------------------------------
+
+    vector<vector<int>> tests = {
+        {7, 2, 9, 4, 3, 8},
+        {10, 5, 1, 8, 7},
+        {23, 12, 45, 3, 19, 8, 30}
+    };
+
+    vector<int> ks = {3, 1, 5}; 
+    // meaning: 3rd smallest, 1st smallest, 5th smallest in respective arrays
+
+    for (int t = 0; t < tests.size(); t++) {
+        vector<int> arr = tests[t];  // copy test
+        comparisons = 0;
+
+        int k = ks[t];  // 1-based
+        int result = randomizedSelect(arr, 0, arr.size() - 1, k - 1);
+
+        cout << "Test " << t + 1 << ": ";
+        for (int x : tests[t]) cout << x << " ";
+
+        cout << "\n" << k << "-th smallest element = " << result;
+        cout << "\nComparisons = " << comparisons << "\n\n";
+    }
+
+    return 0;
+}
+
 
     // ---------------------- Test Case 1 ----------------------
     cout << "===== Test Case 1 =====" << endl;
@@ -580,6 +617,83 @@ int main() {
     cout << "Text is -> " << text <<endl;
     cout << "All suffixes in the suffix tree:" << endl;
     printTree(root);
+
+    return 0;
+}
+
+//=============================================================
+// 8. trie for insert and delete
+#include <iostream>
+#include <string>
+using namespace std;
+
+// Trie Node
+class TrieNode {
+public:
+    TrieNode* child[26];
+    bool isEnd;
+
+    TrieNode() {
+        isEnd = false;
+        for(int i = 0; i < 26; i++)
+            child[i] = NULL;
+    }
+};
+
+// Trie Data Structure
+class Trie {
+private:
+    TrieNode* root;
+
+public:
+    Trie() {
+        root = new TrieNode();
+    }
+
+    // Insert a word
+    void insert(const string &word) {
+        TrieNode* curr = root;
+
+        for(char c : word) {
+            int idx = c - 'a';
+            if(curr->child[idx] == NULL) {
+                curr->child[idx] = new TrieNode();
+            }
+            curr = curr->child[idx];
+        }
+        curr->isEnd = true;
+    }
+
+    // Search a word
+    bool search(const string &word) {
+        TrieNode* curr = root;
+
+        for(char c : word) {
+            int idx = c - 'a';
+            if(curr->child[idx] == NULL)
+                return false;
+            curr = curr->child[idx];
+        }
+        return curr->isEnd;
+    }
+};
+
+int main() {
+    Trie t;
+
+    // Insert words
+    t.insert("apple");
+    t.insert("app");
+    t.insert("bat");
+    t.insert("ball");
+
+    // Test searches
+    cout << (t.search("apple") ? "Found" : "Not Found") << endl;
+    cout << (t.search("app") ? "Found" : "Not Found") << endl;
+    cout << (t.search("bat") ? "Found" : "Not Found") << endl;
+
+    cout << (t.search("bad") ? "Found" : "Not Found") << endl;
+    cout << (t.search("balloon") ? "Found" : "Not Found") << endl;
 
     return 0;
 }
